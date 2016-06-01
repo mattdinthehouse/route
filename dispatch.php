@@ -16,7 +16,7 @@ namespace MD\Dispatch;
     *
     /search/*
   and 'callback' is something that passes is_callable() and has
-  this signature: function($url, $route, $data) { }
+  this signature: function($url, $method, $route, $data) { }
 
   When a route contains ':whatever' segments the value provided
   in that position will be put into $data['whatever'] ie:
@@ -31,11 +31,14 @@ function parseURL($url) {
   return explode('/', trim($url, '/'));
 }
 
-function dispatch($url, $routes) {
+function dispatch($url, $method, $routes) {
   $urlSegments = parseURL($url);
   $numUrlSegments = count($urlSegments);
 
-  foreach($routes as $route => $callback) {
+  foreach($routes as $route => $data) {
+    if(!in_array($method, $data['method']) && $data['method'][0] !== '*')
+      continue;
+
     $routeSegments = parseURL($route);
     $numRouteSegments = count($routeSegments);
 
@@ -58,13 +61,15 @@ function dispatch($url, $routes) {
       }
     }
 
-    if(!is_callable($callback))
-      throw new RuntimeException('Function for '.$route.' is not callable');
-    $callback($url, $route, $segmentData);
+    if(!is_callable($data['handler']))
+      throw new \RuntimeException('Function for '.$route.' is not callable');
+
+    $data['route'] = $route;
+    $data['handler']($url, $method, $data, $segmentData);
 
     return;
   }
 
   // If execution gets here then ...
-  throw new RuntimeException('No matching route for '.$url);
+  throw new \RuntimeException('No matching '.$method.' route for '.$url);
 }

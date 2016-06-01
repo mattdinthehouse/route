@@ -11,27 +11,43 @@ include 'dispatch.php';
 
 
 $routes = array(
-  '/about' =>
-    function($url, $route, $data) {
+  '/about' => array(
+    'method' => array('GET'),
+    'handler' => function($url, $route, $data) {
       print 'Matt is a really cool guy';
     },
+  ),
 
-  '/user/:name' =>
-    function($url, $route, $data) {
+  '/user/:name' => array(
+    'method' => array('*'),
+    'handler' => function($url, $route, $data) {
       print 'Hi there '.ucfirst($data['name']);
     },
+  ),
 
-  '/stuff/*' => 'var_dump',
+  '/insecure/:password' => array( // If using GET then '*' route will run instead
+    'method' => array('POST'),
+    'handler' => 'var_dump',
+  ),
 
-  '/' =>
-    function($url, $route, $data) {
+  '/stuff/*' => array(
+    'method' => array('*'),
+    'handler' => 'var_dump',
+  ),
+
+  '/' => array(
+    'method' => array('GET'),
+    'handler' => function($url, $route, $data) {
       print 'Index page';
     },
+  ),
 
-  '*' =>
-    function($url, $route, $data) {
+  '*' => array(
+    'method' => array('GET'),
+    'handler' => function($url, $route, $data) {
       print 'Error 404: '.$url.' is an undefined route';
     },
+  ),
 );
 
 
@@ -39,9 +55,11 @@ $url = '/';
 if(isset($_SERVER['PATH_INFO']))
   $url = $_SERVER['PATH_INFO'];
 
+$method = $_SERVER['REQUEST_METHOD'];
+
 
 ob_start();
-\MD\Dispatch\dispatch($url, $routes);
+\MD\Dispatch\dispatch($url, $method, $routes);
 $content = ob_get_clean();
 
 ?>
