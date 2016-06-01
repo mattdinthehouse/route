@@ -13,14 +13,15 @@ include 'dispatch.php';
 $routes = array(
   '/about' => array(
     'method' => array('GET'),
-    'handler' => function($url, $route, $data) {
-      print 'Matt is a really cool guy';
+    'handler' => function($url, $method, $route, $data) {
+      print 'Matt is '.$route['description'];
     },
+    'description' => 'a really cool guy',
   ),
 
   '/user/:name' => array(
     'method' => array('*'),
-    'handler' => function($url, $route, $data) {
+    'handler' => function($url, $method, $route, $data) {
       print 'Hi there '.ucfirst($data['name']);
     },
   ),
@@ -37,14 +38,14 @@ $routes = array(
 
   '/' => array(
     'method' => array('GET'),
-    'handler' => function($url, $route, $data) {
+    'handler' => function($url, $method, $route, $data) {
       print 'Index page';
     },
   ),
 
   '*' => array(
     'method' => array('GET'),
-    'handler' => function($url, $route, $data) {
+    'handler' => function($url, $method, $route, $data) {
       print 'Error 404: '.$url.' is an undefined route';
     },
   ),
