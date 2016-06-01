@@ -1,0 +1,5 @@
+This is a small php library that routes requests to functions.
+
+TODO:
+  Support HTTP request method filtering.
+  Pass custom data to the handler function.
